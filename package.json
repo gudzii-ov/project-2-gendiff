@@ -1,6 +1,6 @@
 {
   "name": "gendiff-gudzii-ov",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Hexlet Generate Diff project",
   "main": "index.js",
   "scripts": {
@@ -37,7 +37,7 @@
     "eslint-plugin-import": "^2.11.0"
   },
   "bin": {
-    "brain-games": "dist/bin/gendiff.js"
+    "gendiff": "dist/bin/gendiff.js"
   },
   "files": [
     "dist"
