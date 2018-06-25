@@ -8,7 +8,7 @@ publish:
 	npm publish
 
 lint:
-	npm run eslint src/
+	npm run eslint .
 
 build:
 	npm run build
