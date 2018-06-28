@@ -3,33 +3,45 @@ import path from 'path';
 import genDiff from '../src';
 
 const pathToResults = path.resolve(__dirname, '__fixtures__', 'results.json');
-const results = JSON.parse(fs.readFileSync(pathToResults));
 
-const pathToJSON1 = './__tests__/__fixtures__/before.json';
-const pathToJSON2 = './__tests__/__fixtures__/after.json';
+describe('Compares flat config files', () => {
+  test('compares 2 JSON configs', () => {
+    const pathToJSON1 = './__tests__/__fixtures__/before.json';
+    const pathToJSON2 = './__tests__/__fixtures__/after.json';
 
-const pathToYAML1 = './__tests__/__fixtures__/before.yaml';
-const pathToYAML2 = './__tests__/__fixtures__/after.yaml';
-const pathToYML1 = './__tests__/__fixtures__/before.yml';
-const pathToYML2 = './__tests__/__fixtures__/after.yml';
+    const results = JSON.parse(fs.readFileSync(pathToResults));
+    const expectedFlat = results['flat-diff'];
 
-const pathToINI1 = './__tests__/__fixtures__/before.ini';
-const pathToINI2 = './__tests__/__fixtures__/after.ini';
+    expect(genDiff(pathToJSON1, pathToJSON2)).toBe(expectedFlat);
+  });
 
-const expectedFlat = results['flat-diff'];
+  test('compares 2 YAML configs', () => {
+    const pathToYAML1 = './__tests__/__fixtures__/before.yaml';
+    const pathToYAML2 = './__tests__/__fixtures__/after.yaml';
 
-test('compares 2 JSON configs', () => {
-  expect(genDiff(pathToJSON1, pathToJSON2)).toBe(expectedFlat);
-});
+    const results = JSON.parse(fs.readFileSync(pathToResults));
+    const expectedFlat = results['flat-diff'];
 
-test('compares 2 YAML configs', () => {
-  expect(genDiff(pathToYAML1, pathToYAML2)).toBe(expectedFlat);
-});
+    expect(genDiff(pathToYAML1, pathToYAML2)).toBe(expectedFlat);
+  });
 
-test('compares 2 YML configs', () => {
-  expect(genDiff(pathToYML1, pathToYML2)).toBe(expectedFlat);
-});
+  test('compares 2 YML configs', () => {
+    const pathToYML1 = './__tests__/__fixtures__/before.yml';
+    const pathToYML2 = './__tests__/__fixtures__/after.yml';
 
-test('compares 2 INI configs', () => {
-  expect(genDiff(pathToINI1, pathToINI2)).toBe(expectedFlat);
+    const results = JSON.parse(fs.readFileSync(pathToResults));
+    const expectedFlat = results['flat-diff'];
+
+    expect(genDiff(pathToYML1, pathToYML2)).toBe(expectedFlat);
+  });
+
+  test('compares 2 INI configs', () => {
+    const pathToINI1 = './__tests__/__fixtures__/before.ini';
+    const pathToINI2 = './__tests__/__fixtures__/after.ini';
+
+    const results = JSON.parse(fs.readFileSync(pathToResults));
+    const expectedFlat = results['flat-diff'];
+
+    expect(genDiff(pathToINI1, pathToINI2)).toBe(expectedFlat);
+  });
 });
