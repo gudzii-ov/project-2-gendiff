@@ -1,13 +1,30 @@
 import fs from 'fs';
+import yaml from 'js-yaml';
 import path from 'path';
 import _ from 'lodash';
 
-const genDiff = (pathToFile1, pathToFile2) => {
-  const absolutePath1 = path.resolve(pathToFile1);
-  const absolutePath2 = path.resolve(pathToFile2);
+const configActions = [
+  {
+    type: 'json',
+    check: arg => path.extname(arg) === '.json',
+    parser: arg => JSON.parse(arg),
+  },
+  {
+    type: 'yaml',
+    check: arg => path.extname(arg) === '.yml' || path.extname(arg) === '.yaml',
+    parser: arg => yaml.safeLoad(arg),
+  },
+];
 
-  const data1 = JSON.parse(fs.readFileSync(absolutePath1));
-  const data2 = JSON.parse(fs.readFileSync(absolutePath2));
+const getConfigParser = pathToFile =>
+  configActions.find(({ check }) => check(pathToFile));
+
+const genDiff = (pathToFile1, pathToFile2) => {
+  const rawData1 = fs.readFileSync(path.resolve(pathToFile1));
+  const rawData2 = fs.readFileSync(path.resolve(pathToFile2));
+
+  const data1 = getConfigParser(pathToFile1).parser(rawData1);
+  const data2 = getConfigParser(pathToFile2).parser(rawData2);
 
   const keysSet = new Set([...Object.keys(data1), ...Object.keys(data2)]);
   const keys = Array.from(keysSet);
