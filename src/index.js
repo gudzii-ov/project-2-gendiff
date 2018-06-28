@@ -4,33 +4,34 @@ import ini from 'ini';
 import path from 'path';
 import _ from 'lodash';
 
-const configActions = [
-  {
-    type: 'json',
-    check: arg => path.extname(arg) === '.json',
-    parser: arg => JSON.parse(arg),
-  },
-  {
-    type: 'yaml',
-    check: arg => path.extname(arg) === '.yml' || path.extname(arg) === '.yaml',
-    parser: arg => yaml.safeLoad(arg),
-  },
-  {
-    type: 'ini',
-    check: arg => path.extname(arg) === '.ini',
-    parser: arg => ini.parse(arg),
-  },
-];
+const getConfigParser = (pathToFile) => {
+  const configActions = [
+    {
+      type: 'json',
+      check: arg => path.extname(arg) === '.json',
+      parser: arg => JSON.parse(arg),
+    },
+    {
+      type: 'yaml',
+      check: arg => path.extname(arg) === '.yml' || path.extname(arg) === '.yaml',
+      parser: arg => yaml.safeLoad(arg),
+    },
+    {
+      type: 'ini',
+      check: arg => path.extname(arg) === '.ini',
+      parser: arg => ini.parse(arg),
+    },
+  ];
 
-const getConfigParser = pathToFile =>
-  configActions.find(({ check }) => check(pathToFile));
+  return configActions.find(({ check }) => check(pathToFile)).parser;
+};
 
 const genDiff = (pathToFile1, pathToFile2) => {
   const rawData1 = fs.readFileSync(path.resolve(pathToFile1), 'utf-8');
   const rawData2 = fs.readFileSync(path.resolve(pathToFile2), 'utf-8');
 
-  const data1 = getConfigParser(pathToFile1).parser(rawData1);
-  const data2 = getConfigParser(pathToFile2).parser(rawData2);
+  const data1 = getConfigParser(pathToFile1)(rawData1);
+  const data2 = getConfigParser(pathToFile2)(rawData2);
 
   const keysSet = new Set([...Object.keys(data1), ...Object.keys(data2)]);
   const keys = Array.from(keysSet);
