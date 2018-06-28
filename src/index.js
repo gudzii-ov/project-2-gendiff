@@ -1,9 +1,16 @@
 import fs from 'fs';
+import path from 'path';
 import _ from 'lodash';
 
 const genDiff = (pathToFile1, pathToFile2) => {
-  const data1 = JSON.parse(fs.readFileSync(pathToFile1));
-  const data2 = JSON.parse(fs.readFileSync(pathToFile2));
+  const absolutePath1 = path.resolve(pathToFile1);
+  const absolutePath2 = path.resolve(pathToFile2);
+
+  console.log(absolutePath1);
+  console.log(absolutePath2);
+
+  const data1 = JSON.parse(fs.readFileSync(absolutePath1));
+  const data2 = JSON.parse(fs.readFileSync(absolutePath2));
 
   const keysSet = new Set([...Object.keys(data1), ...Object.keys(data2)]);
   const keys = Array.from(keysSet);
