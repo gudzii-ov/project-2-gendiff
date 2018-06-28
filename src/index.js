@@ -1,5 +1,6 @@
 import fs from 'fs';
 import yaml from 'js-yaml';
+import ini from 'ini';
 import path from 'path';
 import _ from 'lodash';
 
@@ -14,14 +15,19 @@ const configActions = [
     check: arg => path.extname(arg) === '.yml' || path.extname(arg) === '.yaml',
     parser: arg => yaml.safeLoad(arg),
   },
+  {
+    type: 'ini',
+    check: arg => path.extname(arg) === '.ini',
+    parser: arg => ini.parse(arg),
+  },
 ];
 
 const getConfigParser = pathToFile =>
   configActions.find(({ check }) => check(pathToFile));
 
 const genDiff = (pathToFile1, pathToFile2) => {
-  const rawData1 = fs.readFileSync(path.resolve(pathToFile1));
-  const rawData2 = fs.readFileSync(path.resolve(pathToFile2));
+  const rawData1 = fs.readFileSync(path.resolve(pathToFile1), 'utf-8');
+  const rawData2 = fs.readFileSync(path.resolve(pathToFile2), 'utf-8');
 
   const data1 = getConfigParser(pathToFile1).parser(rawData1);
   const data2 = getConfigParser(pathToFile2).parser(rawData2);
