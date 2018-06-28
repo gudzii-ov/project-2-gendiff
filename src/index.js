@@ -26,6 +26,22 @@ const getConfigParser = (pathToFile) => {
   return configActions.find(({ check }) => check(pathToFile)).parser;
 };
 
+const getKeyString = (key, data1, data2) => {
+  if (!(_.has(data2, key))) {
+    return `- ${key}: ${data1[key]}`;
+  }
+
+  if (!(_.has(data1, key))) {
+    return `+ ${key}: ${data2[key]}`;
+  }
+
+  if (data1[key] === data2[key]) {
+    return `  ${key}: ${data1[key]}`;
+  }
+
+  return `+ ${key}: ${data2[key]}\n  - ${key}: ${data1[key]}`;
+};
+
 const genDiff = (pathToFile1, pathToFile2) => {
   const rawData1 = fs.readFileSync(path.resolve(pathToFile1), 'utf-8');
   const rawData2 = fs.readFileSync(path.resolve(pathToFile2), 'utf-8');
@@ -33,55 +49,10 @@ const genDiff = (pathToFile1, pathToFile2) => {
   const data1 = getConfigParser(pathToFile1)(rawData1);
   const data2 = getConfigParser(pathToFile2)(rawData2);
 
-  const keysSet = new Set([...Object.keys(data1), ...Object.keys(data2)]);
-  const keys = Array.from(keysSet);
+  const keys = _.union(Object.keys(data1), Object.keys(data2));
 
-  const keysObjArray = keys.map((cKey) => {
-    const keyObject = {};
-    keyObject.name = cKey;
-
-    if (_.has(data1, cKey) && _.has(data2, cKey)) {
-      keyObject.value = data1[cKey];
-      keyObject.newValue = data2[cKey];
-      keyObject.status = 'changed';
-
-      if (data1[cKey] === data2[cKey]) {
-        keyObject.status = 'unchanged';
-      }
-    }
-
-    if (_.has(data1, cKey) && !(_.has(data2, cKey))) {
-      keyObject.value = data1[cKey];
-      keyObject.status = 'removed';
-    }
-
-    if (!(_.has(data1, cKey)) && _.has(data2, cKey)) {
-      keyObject.newValue = data2[cKey];
-      keyObject.status = 'added';
-    }
-
-    return keyObject;
-  });
-
-  const diffPropertiesArray = keysObjArray.map((cKeyObj) => {
-    switch (cKeyObj.status) {
-      case 'unchanged':
-        return `  ${cKeyObj.name}: ${cKeyObj.value}`;
-      case 'changed':
-        return `+ ${cKeyObj.name}: ${cKeyObj.newValue}\n  - ${cKeyObj.name}: ${cKeyObj.value}`;
-      case 'added':
-        return `+ ${cKeyObj.name}: ${cKeyObj.newValue}`;
-      case 'removed':
-        return `- ${cKeyObj.name}: ${cKeyObj.value}`;
-      default:
-        return 'unexpected status';
-    }
-  });
-
-  const diffPropertiesString = `  ${diffPropertiesArray.join('\n  ')}`;
-  const diff = `{\n${diffPropertiesString}\n}`;
-
-  return diff;
+  return `${keys.reduce((acc, cKey) =>
+    `${acc}  ${getKeyString(cKey, data1, data2)}\n`, '{\n')}}`;
 };
 
 export default genDiff;
