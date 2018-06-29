@@ -1,26 +1,23 @@
 import yaml from 'js-yaml';
 import ini from 'ini';
 
-const configActions = [
-  {
-    type: 'json',
-    check: arg => arg === '.json',
-    parse: arg => JSON.parse(arg),
+const yamlParser = {
+  parse: yaml.safeLoad,
+};
+
+const configActions = {
+  json: {
+    parse: JSON.parse,
   },
-  {
-    type: 'yaml',
-    check: arg => arg === '.yml' || arg === '.yaml',
-    parse: arg => yaml.safeLoad(arg),
+  yaml: yamlParser,
+  yml: yamlParser,
+  ini: {
+    parse: ini.parse,
   },
-  {
-    type: 'ini',
-    check: arg => arg === '.ini',
-    parse: arg => ini.parse(arg),
-  },
-];
+};
 
 export default (format) => {
-  const parser = configActions.find(({ check }) => check(format)).parse;
+  const parser = configActions[format];
   if (!parser) {
     throw new Error(`unkown format: ${format}`);
   }
