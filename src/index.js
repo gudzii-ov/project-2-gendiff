@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import _ from 'lodash';
-import getAction from './parser';
+import getParser from './parser';
 
 const getKeyString = (key, data1, data2) => {
   if (!(_.has(data2, key))) {
@@ -28,8 +28,8 @@ const genDiff = (pathToFile1, pathToFile2) => {
   const format1 = getFormat(pathToFile1).slice(1);
   const format2 = getFormat(pathToFile2).slice(1);
 
-  const data1 = getAction(format1).parse(rawData1);
-  const data2 = getAction(format2).parse(rawData2);
+  const data1 = getParser(format1).parse(rawData1);
+  const data2 = getParser(format2).parse(rawData2);
 
   const keys = _.union(Object.keys(data1), Object.keys(data2));
 
