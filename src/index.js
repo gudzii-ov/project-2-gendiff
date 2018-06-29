@@ -1,30 +1,7 @@
 import fs from 'fs';
-import yaml from 'js-yaml';
-import ini from 'ini';
 import path from 'path';
 import _ from 'lodash';
-
-const getConfigParser = (pathToFile) => {
-  const configActions = [
-    {
-      type: 'json',
-      check: arg => path.extname(arg) === '.json',
-      parser: arg => JSON.parse(arg),
-    },
-    {
-      type: 'yaml',
-      check: arg => path.extname(arg) === '.yml' || path.extname(arg) === '.yaml',
-      parser: arg => yaml.safeLoad(arg),
-    },
-    {
-      type: 'ini',
-      check: arg => path.extname(arg) === '.ini',
-      parser: arg => ini.parse(arg),
-    },
-  ];
-
-  return configActions.find(({ check }) => check(pathToFile)).parser;
-};
+import parse from './parser';
 
 const getKeyString = (key, data1, data2) => {
   if (!(_.has(data2, key))) {
@@ -42,12 +19,17 @@ const getKeyString = (key, data1, data2) => {
   return `+ ${key}: ${data2[key]}\n  - ${key}: ${data1[key]}`;
 };
 
+const getFormat = pathToFile => path.extname(pathToFile);
+
 const genDiff = (pathToFile1, pathToFile2) => {
   const rawData1 = fs.readFileSync(path.resolve(pathToFile1), 'utf-8');
   const rawData2 = fs.readFileSync(path.resolve(pathToFile2), 'utf-8');
 
-  const data1 = getConfigParser(pathToFile1)(rawData1);
-  const data2 = getConfigParser(pathToFile2)(rawData2);
+  const format1 = getFormat(pathToFile1);
+  const format2 = getFormat(pathToFile2);
+
+  const data1 = parse(format1)(rawData1);
+  const data2 = parse(format2)(rawData2);
 
   const keys = _.union(Object.keys(data1), Object.keys(data2));
 
