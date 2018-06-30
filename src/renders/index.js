@@ -1,7 +1,9 @@
 import recursiveRender from './recursive';
+import plainRender from './plain';
 
 const formats = {
   recursive: recursiveRender,
+  plain: plainRender,
 };
 
 export default (format) => {
