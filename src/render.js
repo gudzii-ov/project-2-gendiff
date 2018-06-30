@@ -5,20 +5,19 @@ const keyStatus = {
 };
 
 const keyString = {
-  unchanged: (key, tab) => `${tab}${keyStatus.unchanged}${key.key}: ${key.beforeValue}`,
-  changed: (key, tab) =>
-    `${tab}${keyStatus.added}${key.key}: ${key.afterValue}\n${tab}${keyStatus.removed}${key.key}: ${key.beforeValue}`,
-  added: (key, tab) => `${tab}${keyStatus.added}${key.key}: ${key.afterValue}`,
-  removed: (key, tab) => `${tab}${keyStatus.removed}${key.key}: ${key.beforeValue}`,
+  unchanged: (key, depth) =>
+    `${' '.repeat(2 * depth)}${keyStatus.unchanged}${key.key}: ${key.beforeValue}`,
+  changed: (key, depth) =>
+    `${' '.repeat(2 * depth)}${keyStatus.added}${key.key}: ${key.afterValue}\n${' '.repeat(2 * depth)}${keyStatus.removed}${key.key}: ${key.beforeValue}`,
+  added: (key, depth) =>
+    `${' '.repeat(2 * depth)}${keyStatus.added}${key.key}: ${key.afterValue}`,
+  removed: (key, depth) =>
+    `${' '.repeat(2 * depth)}${keyStatus.removed}${key.key}: ${key.beforeValue}`,
 };
 
 const getKeyString = type => keyString[type];
 
-const renderNode = (node, depth) => {
-  const tab = ' '.repeat(2 * depth);
-
-  return getKeyString(node.type)(node, tab);
-};
+const renderNode = (node, depth) => getKeyString(node.type)(node, depth);
 
 export default (ast) => {
   const renderedKeys = ast.map(node => renderNode(node, 1));
