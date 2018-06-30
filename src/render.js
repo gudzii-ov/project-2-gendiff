@@ -1,17 +1,28 @@
-const spacer = ' '.repeat(2);
+const keyStatus = {
+  unchanged: '  ',
+  added: '+ ',
+  removed: '- ',
+};
 
 const keyString = {
-  unchanged: key => `${spacer}  ${key.key}: ${key.beforeValue}`,
-  changed: key =>
-    `${spacer}+ ${key.key}: ${key.afterValue}\n${spacer}- ${key.key}: ${key.beforeValue}`,
-  added: key => `${spacer}+ ${key.key}: ${key.afterValue}`,
-  removed: key => `${spacer}- ${key.key}: ${key.beforeValue}`,
+  unchanged: (key, tab) => `${tab}${keyStatus.unchanged}${key.key}: ${key.beforeValue}`,
+  changed: (key, tab) =>
+    `${tab}${keyStatus.added}${key.key}: ${key.afterValue}\n${tab}${keyStatus.removed}${key.key}: ${key.beforeValue}`,
+  added: (key, tab) => `${tab}${keyStatus.added}${key.key}: ${key.afterValue}`,
+  removed: (key, tab) => `${tab}${keyStatus.removed}${key.key}: ${key.beforeValue}`,
 };
 
 const getKeyString = type => keyString[type];
 
+const renderNode = (node, depth) => {
+  const spacer = ' '.repeat(2);
+  const tab = spacer.repeat(depth);
+
+  return getKeyString(node.type)(node, tab);
+};
+
 export default (ast) => {
-  const renderedKeys = ast.map(key => getKeyString(key.type)(key));
+  const renderedKeys = ast.map(node => renderNode(node, 1));
 
   const result = ['{', ...renderedKeys, '}'];
 
