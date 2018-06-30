@@ -17,12 +17,11 @@ const keyString = {
 
 const getKeyString = type => keyString[type];
 
-const renderNode = (node, depth) => getKeyString(node.type)(node, depth);
-
-export default (ast) => {
-  const renderedKeys = ast.map(node => renderNode(node, 1));
-
-  const result = ['{', ...renderedKeys, '}'];
+const renderNode = (node, depth) => {
+  const renderedKeys = node.map(key => getKeyString(key.type)(key, depth + 1));
+  const result = [`${' '.repeat(2 * depth)}{`, ...renderedKeys, `${' '.repeat(2 * depth)}}`];
 
   return result.join('\n');
 };
+
+export default ast => renderNode(ast, 0);
