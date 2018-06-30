@@ -1,12 +1,12 @@
 import fs from 'fs';
 import path from 'path';
-import getParser from './parser';
 import buildAst from './build-ast';
-import render from './render';
+import getParser from './parser';
+import getRender from './renders';
 
 const getFormat = pathToFile => path.extname(pathToFile);
 
-const genDiff = (pathToFile1, pathToFile2) => {
+const genDiff = (pathToFile1, pathToFile2, format) => {
   const rawData1 = fs.readFileSync(path.resolve(pathToFile1), 'utf-8');
   const rawData2 = fs.readFileSync(path.resolve(pathToFile2), 'utf-8');
 
@@ -18,7 +18,7 @@ const genDiff = (pathToFile1, pathToFile2) => {
 
   const ast = buildAst(data1, data2);
 
-  const diff = render(ast);
+  const diff = getRender(format)(ast);
 
   return diff;
 };
