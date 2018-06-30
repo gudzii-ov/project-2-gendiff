@@ -1,20 +1,24 @@
-const indent = ' '.repeat(2);
+import _ from 'lodash';
 
-const stringify = (node, depth) => {
-  if (!(node instanceof Object)) {
-    return node;
+const indent = ' '.repeat(2);
+const getTab = depth => indent.repeat(depth);
+
+const stringify = (value, depth) => {
+  if (!(value instanceof Object)) {
+    return value;
   }
 
-  const nodeKeys = Object.keys(node);
-  const string = nodeKeys.map(cKey =>
-    `${indent.repeat(depth + 1)}${cKey}: ${stringify(node[cKey], depth + 1)}`).join('\n');
+  const valueKeys = Object.keys(value);
+  const valueString = valueKeys
+    .map(key =>
+      `${getTab(depth + 2)}${key}: ${stringify(value[key], depth + 1)}`).join('\n');
 
-  const result = ['{', string, `${indent.repeat(depth)}}`].join('\n');
+  const string = `{\n${valueString}\n${getTab(depth)}}`;
 
-  return result;
+  return string;
 };
 
-const keyStatus = {
+const keyType = {
   unchanged: '  ',
   added: '+ ',
   removed: '- ',
@@ -22,24 +26,24 @@ const keyStatus = {
 
 const keyString = {
   unchanged: (key, depth) =>
-    `${indent.repeat(depth)}${keyStatus.unchanged}${key.key}: ${key.beforeValue}`,
+    `${getTab(depth)}${keyType.unchanged}${key.name}: ${stringify(key.valueBefore, depth + 1)}`,
   changed: (key, depth) =>
-    `${indent.repeat(depth)}${keyStatus.added}${key.key}: ${key.afterValue}\n${indent.repeat(depth)}${keyStatus.removed}${key.key}: ${key.beforeValue}`,
+    [`${getTab(depth)}${keyType.added}${key.name}: ${stringify(key.valueAfter, depth + 1)}`,
+      `${getTab(depth)}${keyType.removed}${key.name}: ${stringify(key.valueBefore, depth + 1)}`],
   added: (key, depth) =>
-    `${indent.repeat(depth)}${keyStatus.added}${key.key}: ${key.afterValue}`,
+    `${getTab(depth)}${keyType.added}${key.name}: ${stringify(key.valueAfter, depth + 1)}`,
   removed: (key, depth) =>
-    `${indent.repeat(depth)}${keyStatus.removed}${key.key}: ${key.beforeValue}`,
+    `${getTab(depth)}${keyType.removed}${key.name}: ${stringify(key.valueBefore, depth + 1)}`,
+  nested: (key, depth, render) =>
+    `${getTab(depth)}${keyType.unchanged}${key.name}: ${render(key.children, depth + 1)}`,
 };
 
 const getKeyString = type => keyString[type];
 
-const renderNode = (node, depth) => {
-  const renderedKeys = node.map(key => getKeyString(key.type)(key, depth + 1));
-  const result = [`${indent.repeat(depth)}{`, ...renderedKeys, `${indent.repeat(depth)}}`];
+const renderNode = (data, depth) => {
+  const nodeString = _.flatten(data.map(node => getKeyString(node.type)(node, depth + 1, renderNode))).join('\n');
 
-  return result.join('\n');
+  return `{\n${nodeString}\n${getTab(depth)}}`;
 };
 
-export default (ast) => {
-  return renderNode(ast, 0);
-};
+export default ast => renderNode(ast, 0);
