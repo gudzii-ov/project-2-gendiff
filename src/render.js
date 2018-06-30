@@ -15,8 +15,7 @@ const keyString = {
 const getKeyString = type => keyString[type];
 
 const renderNode = (node, depth) => {
-  const spacer = ' '.repeat(2);
-  const tab = spacer.repeat(depth);
+  const tab = ' '.repeat(2 * depth);
 
   return getKeyString(node.type)(node, tab);
 };
