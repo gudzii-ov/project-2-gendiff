@@ -14,6 +14,7 @@ const plainStrings = {
   changed: (name, prop) => `Property '${name.join('.')}' was updated. From ${stringify(prop.valueBefore, '')} to ${stringify(prop.valueAfter, '')}`,
   added: (name, prop) => `Property '${name.join('.')}' was added with ${stringify(prop.valueAfter, 'value: ')}`,
   removed: name => `Property '${name.join('.')}' was removed`,
+  nested: (name, prop, fn) => fn(prop.children, name),
 };
 
 const getString = type => plainStrings[type];
@@ -21,13 +22,8 @@ const getString = type => plainStrings[type];
 const getResultString = (ast, fullName) => ast
   .filter(node => node.type !== 'unchanged')
   .map((node) => {
-    if (node.type === 'nested') {
-      return getResultString(node.children, [...fullName, node.name]);
-    }
-
     const name = [...fullName, node.name];
-
-    return getString(node.type)(name, node);
+    return getString(node.type)(name, node, getResultString);
   })
   .join('\n');
 
