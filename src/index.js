@@ -6,19 +6,19 @@ import getRender from './renders';
 
 const getFormat = pathToFile => path.extname(pathToFile);
 
-const genDiff = (pathToFile1, pathToFile2, format) => {
+const genDiff = (pathToFile1, pathToFile2, outputFormat) => {
   const rawData1 = fs.readFileSync(path.resolve(pathToFile1), 'utf-8');
   const rawData2 = fs.readFileSync(path.resolve(pathToFile2), 'utf-8');
 
-  const format1 = getFormat(pathToFile1).slice(1);
-  const format2 = getFormat(pathToFile2).slice(1);
+  const configFormat1 = getFormat(pathToFile1).slice(1);
+  const configFormat2 = getFormat(pathToFile2).slice(1);
 
-  const data1 = getParser(format1).parse(rawData1);
-  const data2 = getParser(format2).parse(rawData2);
+  const data1 = getParser(configFormat1).parse(rawData1);
+  const data2 = getParser(configFormat2).parse(rawData2);
 
   const ast = buildAst(data1, data2);
 
-  const diff = getRender(format)(ast);
+  const diff = getRender(outputFormat)(ast);
 
   return diff;
 };
