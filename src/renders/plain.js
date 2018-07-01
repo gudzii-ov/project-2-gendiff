@@ -11,22 +11,24 @@ const stringify = (value, prefix) => {
 };
 
 const plainStrings = {
-  changed: prop => `Property '${prop.name}' was updated. From ${stringify(prop.valueBefore, '')} to ${stringify(prop.valueAfter, '')}`,
-  added: prop => `Property '${prop.name}' was added with ${stringify(prop.valueAfter, 'value: ')}`,
-  removed: prop => `Property '${prop.name}' was removed`,
+  changed: (name, prop) => `Property '${name.join('.')}' was updated. From ${stringify(prop.valueBefore, '')} to ${stringify(prop.valueAfter, '')}`,
+  added: (name, prop) => `Property '${name.join('.')}' was added with ${stringify(prop.valueAfter, 'value: ')}`,
+  removed: name => `Property '${name.join('.')}' was removed`,
 };
 
 const getString = type => plainStrings[type];
 
-const render = (ast) => {
-  const string = ast
-    .filter(cProp => (cProp.type !== 'nested') && (cProp.type !== 'unchanged'))
-    .map(cProp => getString(cProp.type)(cProp))
-    .join('\n');
+const getResultString = (ast, fullName) => ast
+  .filter(node => node.type !== 'unchanged')
+  .map((node) => {
+    if (node.type === 'nested') {
+      return getResultString(node.children, [...fullName, node.name]);
+    }
 
-  const result = `\n${string}`;
+    const name = [...fullName, node.name];
 
-  return result;
-};
+    return getString(node.type)(name, node);
+  })
+  .join('\n');
 
-export default render;
+export default ast => `\n${getResultString(ast, [])}`;
