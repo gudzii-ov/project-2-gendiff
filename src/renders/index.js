@@ -7,9 +7,9 @@ const formats = {
 };
 
 export default (format) => {
-  const parser = formats[format];
-  if (!parser) {
+  const render = formats[format];
+  if (!render) {
     throw new Error(`unkown format: ${format}`);
   }
-  return parser;
+  return render;
 };
