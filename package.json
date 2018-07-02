@@ -1,6 +1,6 @@
 {
   "name": "gendiff-gudzii-ov",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Hexlet Generate Diff project",
   "main": "index.js",
   "scripts": {
