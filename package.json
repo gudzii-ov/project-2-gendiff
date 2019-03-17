@@ -51,13 +51,13 @@
     "@babel/preset-env": "^7.0.0",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^9.0.0",
-    "babel-jest": "^23.4.2",
+    "babel-jest": "^24.5.0",
     "cross-env": "^5.1.4",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-jest": "^21.27.2",
-    "jest": "^23.6.0",
+    "jest": "^24.5.0",
     "regenerator-runtime": "^0.12.1"
   },
   "bin": {
