@@ -7,12 +7,17 @@ start:
 test:
 	npm run test
 
+test-coverage:
+	npm run test -- --coverage
+
 publish:
 	npm publish
 
 lint:
-	npm run eslint .
+	npx eslint .
 
 build:
 	rm -rf dist
 	npm run build
+
+.PHONY: test
